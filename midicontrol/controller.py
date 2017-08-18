@@ -8,7 +8,8 @@ from . import x11
 
 
 class Controller(object):
-    def __init__(self, target_window_name=None):
+    def __init__(self, keyboard, target_window_name=None):
+        self.keyboard = keyboard
         self.target_window_name = target_window_name
 
         def parse_and_send_commands(event, cmds):
@@ -93,4 +94,4 @@ class Controller(object):
         self.event_manager.doublehit(*args, **kwargs)
 
     def is_button(self, code):
-        return True
+        return self.keyboard.is_button(code)

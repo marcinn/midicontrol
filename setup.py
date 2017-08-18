@@ -9,4 +9,8 @@ setup(name='midicontrol',
       license='BSD',
       packages=['midicontrol'],
       scripts=['bin/midicontrol'],
-      zip_safe=True)
+      include_package_data=True,
+      package_data = {
+          'midicontrol': ['data/devices/*.ini'],
+          },
+      zip_safe=False)

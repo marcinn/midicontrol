@@ -1,0 +1,10 @@
+{
+    "window_class": "ntcardvt",
+    "devices": [{
+        "name": "nanoKONTROL2",
+        "events": [
+            {"event": "keyup", "code": "play", "command": "l"},
+            {"event": "keyup", "code": "stop", "command": "k"}
+        ]
+    }]
+}

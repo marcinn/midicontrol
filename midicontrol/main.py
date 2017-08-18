@@ -3,6 +3,9 @@ import traceback
 import argparse
 import time
 
+from .controller import Controller
+from . import keyboards
+
 
 def safe_handle(callback):
     def wrapped(*args, **kw):
@@ -13,7 +16,8 @@ def safe_handle(callback):
     return wrapped
 
 
-def main(midi_port_name, controller):
+def main(controller):
+    midi_port_name = controller.keyboard.midi_port_name
     port = rtmidi.RtMidiIn()
 
     tries = 0
@@ -44,19 +48,58 @@ def main(midi_port_name, controller):
     port.closePort()
 
 
+def list_keyboards(opts):
+    for id_, keyboard in keyboards.registry.items():
+        print("{0} {1} ({2})".format(
+            keyboard.name, type(keyboard).__name__,
+            keyboard.product_id))
+
+
+def start(opts):
+    try:
+        product_id = opts.keyboard.split('_')[0]
+    except IndexError:
+        product_id = opts.keyboard
+
+    try:
+        keyboard = keyboards.registry.get(product_id)
+    except KeyError:
+        print("Unhandled keyboard: %s" % product_id)
+    else:
+        print("Using device: {0}".format(keyboard))
+        controller = Controller(
+            keyboard=keyboard,
+            target_window_name=opts.target_window_name)
+        main(controller)
+
+
 def run_cli():
-    from .nanokontrol2 import factory
+    actions = {
+            'start': start,
+            'list-keyboards': list_keyboards,
+            }
+
+    keyboards.initialize()
 
     parser = argparse.ArgumentParser('Midi control to keyboard mapper')
-    parser.add_argument(
+    commands = parser.add_subparsers(help='List of possible commands', dest='action')
+
+    start_parser = commands.add_parser('start')
+    list_keyboards_parser = commands.add_parser('list-keyboards')
+
+    start_parser.add_argument(
+            '-d', dest='keyboard', action='store', required=True,
+            help='Device identifier in format idVendor:idProduct (i.e. 0944:0117)')
+    start_parser.add_argument(
             '-w', dest='target_window_name', action='store',
             help='send keys only to the window of matching name')
 
     opts = parser.parse_args()
 
-    controller = factory(
-            target_window_name=opts.target_window_name)
-    main('nanoKONTROL2', controller)
+    if opts.action:
+        actions[opts.action](opts)
+    else:
+        parser.print_help()
 
 
 if __name__ == '__main__':

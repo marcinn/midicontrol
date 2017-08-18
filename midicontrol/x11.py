@@ -15,11 +15,15 @@ NET_ACTIVE_WINDOW = display.intern_atom('_NET_ACTIVE_WINDOW')
 
 def get_focused_window_name():
     if current_window:
-        return current_window.get_full_property(WM_CLASS, 0).value
+        try:
+            return current_window.get_full_property(WM_CLASS, 0).value
+        except Xlib.error.XError:
+            return ''
     return ''
 
 
 def is_window_in_focus(name):
+    print(get_focused_window_name())
     return name in get_focused_window_name()
 
 
