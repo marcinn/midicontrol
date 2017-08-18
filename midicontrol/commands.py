@@ -87,14 +87,16 @@ def addmodifier(ctrl, x):
     @command()
     def wrapped(event):
         ctrl.enable_modifier(x)
+        return []
     return wrapped
 
 
-def remmodifier(crel, x):
+def remmodifier(ctrl, x):
     @command()
     def wrapped(event):
         if x in event.modifiers:
             ctrl.disable_modifier(x)
+        return []
     return wrapped
 
 
