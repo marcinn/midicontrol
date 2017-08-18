@@ -2,6 +2,7 @@ import time
 from collections import defaultdict
 from .commands import cmd
 from .utils import debug
+from . import x11 
 
 
 EV_KEYUP = 'keyup'
@@ -212,4 +213,5 @@ class EventsManager(object):
     def loop(self):
         while True:
             self.update()
+            x11.update()
             time.sleep(0.1)

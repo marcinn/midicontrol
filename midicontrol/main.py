@@ -1,6 +1,7 @@
 import rtmidi
 import traceback
 import argparse
+import time
 
 
 def safe_handle(callback):
@@ -15,11 +16,21 @@ def safe_handle(callback):
 def main(midi_port_name, controller):
     port = rtmidi.RtMidiIn()
 
+    tries = 0
     port_number = None
-    for x in range(port.getPortCount()):
-        if port.getPortName(x).startswith(midi_port_name):
-            port_number = x
+
+    while tries < 10:
+        for x in range(port.getPortCount()):
+            if port.getPortName(x).startswith(midi_port_name):
+                port_number = x
+                break
+        if port_number is None:
+            print("Waiting for device: %s" % midi_port_name)
+            time.sleep(1)
+            tries += 1
+        else:
             break
+
     if port_number is None:
         raise ValueError(
                 'Midi port "%s" was not found' % midi_port_name)
@@ -33,7 +44,7 @@ def main(midi_port_name, controller):
     port.closePort()
 
 
-if __name__ == '__main__':
+def run_cli():
     from .nanokontrol2 import factory
 
     parser = argparse.ArgumentParser('Midi control to keyboard mapper')
@@ -46,3 +57,7 @@ if __name__ == '__main__':
     controller = factory(
             target_window_name=opts.target_window_name)
     main('nanoKONTROL2', controller)
+
+
+if __name__ == '__main__':
+    run_cli()

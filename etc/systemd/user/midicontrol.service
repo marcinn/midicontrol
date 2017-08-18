@@ -1,0 +1,6 @@
+[Unit]
+Description=Control midi keyboards
+StopWhenUnneeded=true
+
+[Service]
+ExecStart=/usr/bin/midicontrol

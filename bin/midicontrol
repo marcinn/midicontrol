@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+
+import midicontrol.main
+midicontrol.main.run_cli()
